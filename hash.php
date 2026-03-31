@@ -7,20 +7,12 @@ function encryptData($plaintext, $key) {
     return base64_encode($iv . $ciphertext);
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = isset($_POST['name']) ? $_POST['name'] : '';
-    $amount = isset($_POST['amount']) ? $_POST['amount'] : '';
-    $code = isset($_POST['code']) ? $_POST['code'] : '';
-
-
-    $data = json_encode([
-        'name' => $name,
-        'amount' => $amount,
-        'code' => $code
-    ]);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['txtfile']) && $_FILES['txtfile']['error'] === UPLOAD_ERR_OK) {
+    $fileTmpPath = $_FILES['txtfile']['tmp_name'];
+    $fileContents = file_get_contents($fileTmpPath);
 
     $key = str_pad('6043924', 32, '0');
-    $output = encryptData($data, $key);
+    $output = encryptData($fileContents, $key);
 
     $txtFile = __DIR__ . '/bestandInfo.txt';
     file_put_contents($txtFile, $output);
